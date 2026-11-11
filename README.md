@@ -34,7 +34,7 @@ Zorg dat de volgende software en hardware aanwezig is:
 
 ---
 
-## 🚀 Installatie & Uitvoering
+## Installatie & Uitvoering
 
 Volg deze stappen om het project op de Raspberry Pi te draaien.
 
