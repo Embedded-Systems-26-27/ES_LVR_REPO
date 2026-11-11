@@ -1,0 +1,411 @@
+[
+    {
+        "id": "9f4a41ae6419423e",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "486b2f2c87c03f39",
+        "type": "rpi-gpio out",
+        "z": "9f4a41ae6419423e",
+        "name": "",
+        "pin": "17",
+        "set": "",
+        "level": "0",
+        "freq": "",
+        "out": "out",
+        "bcm": true,
+        "x": 680,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "dde7b5c8bc3395ed",
+        "type": "mqtt out",
+        "z": "9f4a41ae6419423e",
+        "name": "",
+        "topic": "CHANGE_DETECTED",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "394170e9828512ad",
+        "x": 680,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "0f04d33a1857e214",
+        "type": "mqtt in",
+        "z": "9f4a41ae6419423e",
+        "name": "",
+        "topic": "CHANGE_DETECTED",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "394170e9828512ad",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 240,
+        "y": 340,
+        "wires": [
+            [
+                "9e711d298b3292b9"
+            ]
+        ]
+    },
+    {
+        "id": "32bcd00e47b88d51",
+        "type": "function",
+        "z": "9f4a41ae6419423e",
+        "name": "function 1",
+        "func": "msg.payload = {\n    \"pin\": 13,\n    \"state\": msg.payload\n};\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 180,
+        "wires": [
+            [
+                "dde7b5c8bc3395ed"
+            ]
+        ]
+    },
+    {
+        "id": "976e3841453e2d63",
+        "type": "ui-led",
+        "z": "9f4a41ae6419423e",
+        "name": "",
+        "group": "4ecff4b77d62d286",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "labelPlacement": "left",
+        "labelAlignment": "left",
+        "states": [
+            {
+                "value": "0",
+                "valueType": "num",
+                "color": "#ff0000"
+            },
+            {
+                "value": "1",
+                "valueType": "num",
+                "color": "#00ff00"
+            }
+        ],
+        "allowColorForValueInMessage": false,
+        "shape": "circle",
+        "showBorder": true,
+        "showGlow": true,
+        "x": 450,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "5f3aae7b5051d343",
+        "type": "ui-template",
+        "z": "9f4a41ae6419423e",
+        "group": "4ecff4b77d62d286",
+        "page": "",
+        "ui": "",
+        "name": "",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n<div>\n<h2>Relais State</h2>\n<!-- Checkbox with change event -->\n<div class=\"mt-3\">\n<label>\n<input type=\"checkbox\" v-model=\"checked\" @change=\"onChange\" />\nStatus\n</label>\n</div>\n</div>\n</template>\n<script>\nexport default {\ndata() { return { checked: false } },\nmethods: { onChange() {\n// Send message to Node-RED when checkbox state changes\nthis.send({ payload: this.checked?1:0 })\n}}\n}\n</script>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 480,
+        "y": 440,
+        "wires": [
+            [
+                "f33bb4df4e823747"
+            ]
+        ]
+    },
+    {
+        "id": "9e711d298b3292b9",
+        "type": "change",
+        "z": "9f4a41ae6419423e",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "msg.payload.state",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 500,
+        "y": 340,
+        "wires": [
+            [
+                "486b2f2c87c03f39"
+            ]
+        ]
+    },
+    {
+        "id": "f33bb4df4e823747",
+        "type": "mqtt out",
+        "z": "9f4a41ae6419423e",
+        "name": "",
+        "topic": "CHANGE_DETECTED",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "394170e9828512ad",
+        "x": 720,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "3594daa85c7c63ff",
+        "type": "rpi-gpio in",
+        "z": "9f4a41ae6419423e",
+        "name": "",
+        "pin": "27",
+        "intype": "tri",
+        "debounce": "25",
+        "read": true,
+        "bcm": true,
+        "x": 190,
+        "y": 180,
+        "wires": [
+            [
+                "32bcd00e47b88d51",
+                "976e3841453e2d63",
+                "d93c292863ef40a9"
+            ]
+        ]
+    },
+    {
+        "id": "5457352589c953d6",
+        "type": "mysql",
+        "z": "9f4a41ae6419423e",
+        "mydb": "7283bede7bafeeb5",
+        "name": "",
+        "x": 630,
+        "y": 240,
+        "wires": [
+            [
+                "7d2d7bc704e303ee"
+            ]
+        ]
+    },
+    {
+        "id": "d93c292863ef40a9",
+        "type": "function",
+        "z": "9f4a41ae6419423e",
+        "name": "function 2",
+        "func": "var gekozenDatum = msg.payload;\n\nmsg.topic = \"SELECT pin, state, timestamp FROM events WHERE DATE(timestamp) = ?\";\nmsg.payload = [gekozenDatum];\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 240,
+        "wires": [
+            [
+                "5457352589c953d6"
+            ]
+        ]
+    },
+    {
+        "id": "7d2d7bc704e303ee",
+        "type": "ui-table",
+        "z": "9f4a41ae6419423e",
+        "group": "4ecff4b77d62d286",
+        "name": "",
+        "label": "",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "maxrows": 0,
+        "passthru": false,
+        "autocols": true,
+        "showSearch": true,
+        "deselect": true,
+        "selectionType": "none",
+        "columns": [],
+        "mobileBreakpoint": "sm",
+        "mobileBreakpointType": "defaults",
+        "action": "append",
+        "className": "",
+        "x": 790,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "394170e9828512ad",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "192.168.137.1",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "4ecff4b77d62d286",
+        "type": "ui-group",
+        "name": "Group 1",
+        "page": "f4fed8acb0b44faa",
+        "width": 6,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default",
+        "tab": ""
+    },
+    {
+        "id": "7283bede7bafeeb5",
+        "type": "MySQLdatabase",
+        "name": "",
+        "host": "127.0.0.1",
+        "port": "3306",
+        "db": "myDB",
+        "tz": "",
+        "charset": "UTF8"
+    },
+    {
+        "id": "f4fed8acb0b44faa",
+        "type": "ui-page",
+        "name": "Page 1",
+        "ui": "e960bba7cd64e3de",
+        "path": "/page1",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "a9be075f7c7cba34",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": 0,
+                "cols": 3
+            },
+            {
+                "name": "Tablet",
+                "px": 576,
+                "cols": 6
+            },
+            {
+                "name": "Small Desktop",
+                "px": 768,
+                "cols": 9
+            },
+            {
+                "name": "Desktop",
+                "px": 1024,
+                "cols": 12
+            }
+        ],
+        "tabs": [],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "e960bba7cd64e3de",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "a9be075f7c7cba34",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#fcfcfd",
+            "primary": "#0d74ce",
+            "bgPage": "#f9f9fb",
+            "groupBg": "#ffffff",
+            "groupOutline": "#d9d9e0"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "3116890eebe20ca8",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-node-pi-gpio": "2.0.7",
+            "@flowfuse/node-red-dashboard-2-ui-led": "1.1.1",
+            "@flowfuse/node-red-dashboard": "1.33.0",
+            "node-red-node-mysql": "3.0.3"
+        }
+    }
+]
