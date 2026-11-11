@@ -1,0 +1,127 @@
+[
+    {
+        "id": "5f3aae7b5051d343",
+        "type": "ui-template",
+        "z": "9f4a41ae6419423e",
+        "group": "4ecff4b77d62d286",
+        "page": "",
+        "ui": "",
+        "name": "",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n  <div>\n    <h2>Relais State</h2>\n    \n    <div class=\"mt-3\">\n      <label>\n        <!-- VOEG value=\"1\" TOE EN GEBRUIK :checked -->\n        <input type=\"checkbox\" :checked=\"checked\" @change=\"onChange\" />\n        Status\n      </label>\n    </div>\n  </div>\n</template>\n\n<script>\nexport default {\n  data() { \n    return { checked: false } \n  },\n  methods: { \n    onChange(event) {\n      // Lees de echte status uit van de checkbox in de DOM\n      this.checked = event.target.checked;\n      \n      // Stuur 1 of 0\n      this.send({ payload: this.checked ? 1 : 0 });\n    }\n  }\n}\n</script>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 480,
+        "y": 440,
+        "wires": [
+            [
+                "f33bb4df4e823747"
+            ]
+        ]
+    },
+    {
+        "id": "4ecff4b77d62d286",
+        "type": "ui-group",
+        "name": "Group 1",
+        "page": "f4fed8acb0b44faa",
+        "width": 6,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default",
+        "tab": ""
+    },
+    {
+        "id": "f4fed8acb0b44faa",
+        "type": "ui-page",
+        "name": "Page 1",
+        "ui": "e960bba7cd64e3de",
+        "path": "/page1",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "a9be075f7c7cba34",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": 0,
+                "cols": 3
+            },
+            {
+                "name": "Tablet",
+                "px": 576,
+                "cols": 6
+            },
+            {
+                "name": "Small Desktop",
+                "px": 768,
+                "cols": 9
+            },
+            {
+                "name": "Desktop",
+                "px": 1024,
+                "cols": 12
+            }
+        ],
+        "tabs": [],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "e960bba7cd64e3de",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "a9be075f7c7cba34",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#fcfcfd",
+            "primary": "#0d74ce",
+            "bgPage": "#f9f9fb",
+            "groupBg": "#ffffff",
+            "groupOutline": "#d9d9e0"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "feb8f6b0291eca38",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@flowfuse/node-red-dashboard": "1.33.0"
+        }
+    }
+]
