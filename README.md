@@ -12,7 +12,7 @@ Dit project is een uitwerking van de opdracht "MQTT met Node-RED" voor het vak E
 
 ---
 
-## 🛠️ Vereisten (Prerequisites)
+## Vereisten (Prerequisites)
 
 Zorg dat de volgende software en hardware aanwezig is:
 
