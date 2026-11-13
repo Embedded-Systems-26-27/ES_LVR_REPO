@@ -1,0 +1,240 @@
+import inspect
+import re
+from ollama import chat, ChatResponse
+from plugins.getDateAndTime import get_current_date, get_current_time
+from plugins.getHackerNews import get_hackernews_info
+from plugins.getWeather import get_weather
+from plugins.notesManager import save_note, get_note, list_notes, update_note, delete_note, search_notes
+
+
+def logic(messages):
+    """
+    Process messages and handle tool calls
+    Returns appropriate response from the LLM.
+    """
+    available_functions = {
+        'get_current_date': get_current_date,
+        'get_current_time': get_current_time,
+        'get_hackernews_info': get_hackernews_info,
+        'get_weather': get_weather,
+        'save_note': save_note,
+        'get_note': get_note,
+        'list_notes': list_notes,
+        'update_note': update_note,
+        'delete_note': delete_note,
+        'search_notes': search_notes
+    }
+
+    # Define tool schema more explicitly
+    tools = [{
+        "type": "function",
+        "function": {
+                "name": "get_current_date",
+            "description": "Get today's date",
+            "parameters": {
+                        "type": "object",
+                        "properties": {},
+                        "required": []
+            }
+        }
+    }, {
+        "type": "function",
+        "function": {
+                "name": "get_current_time",
+            "description": "Always get the current time of the day",
+                "parameters": {
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                }
+        }
+    },
+        {
+        "type": "function",
+        "function": {
+            "name": "get_hackernews_info",
+            "description": "Get top stories from HackerNews",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "The user's query about HackerNews stories"
+                    }
+                },
+                "required": []
+            }
+        }
+    },
+        {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Always get weather information for a specific city",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "city": {
+                        "type": "string",
+                        "description": "The name of the city to get weather information for"
+                    }
+                },
+                "required": ["city"]
+            }
+        }
+    }, {
+        "type": "function",
+                "function": {
+                    "name": "save_note",
+                    "description": "Save a note with a title and content",
+                    "parameters": {
+                            "type": "object",
+                            "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "description": "The title of the note"
+                                    },
+                                "content": {
+                                        "type": "string",
+                                        "description": "The content of the note"
+                                }
+                            },
+                        "required": ["title", "content"]
+                    }
+                }
+    },
+        {
+        "type": "function",
+                "function": {
+                    "name": "get_note",
+                    "description": "Retrieve a note by its title",
+                    "parameters": {
+                            "type": "object",
+                            "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "description": "The title of the note to retrieve"
+                                    }
+                            },
+                        "required": ["title"]
+                    }
+                }
+    },
+        {
+        "type": "function",
+                "function": {
+                    "name": "search_notes",
+                    "description": "Search for notes containing a specific term",
+                    "parameters": {
+                            "type": "object",
+                            "properties": {
+                                    "query": {
+                                        "type": "string",
+                                        "description": "The search term to find in notes"
+                                    }
+                            },
+                        "required": ["query"]
+                    }
+                }
+    },
+        {
+        "type": "function",
+                "function": {
+                    "name": "list_notes",
+                    "description": "List all available notes",
+                    "parameters": {
+                            "type": "object",
+                            "properties": {},
+                        "required": []
+                    }
+                }
+
+    }, {
+        "type": "function",
+                "function": {
+                    "name": "update_note",
+                    "description": "Update an existing note with new content",
+                    "parameters": {
+                            "type": "object",
+                            "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "description": "The title of the note to update"
+                                    },
+                                "content": {
+                                        "type": "string",
+                                        "description": "The new content for the note"
+                                }
+                            },
+                        "required": ["title", "content"]
+                    }
+                }
+    }, {
+        "type": "function",
+                "function": {
+                    "name": "delete_note",
+                    "description": "Delete a note by its title",
+                    "parameters": {
+                            "type": "object",
+                            "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "description": "The title of the note to delete"
+                                    }
+                            },
+                        "required": ["title"]
+                    }
+                }
+    }]
+
+    # Get initial response
+    response = chat(model='qwen-pi', messages=messages, tools=tools)
+
+    # Clean the response content
+    if 'content' in response.message and response.message['content']:
+        response.message['content'] = re.sub(
+            r'<think>.*?</think>', '', response.message['content'], flags=re.DOTALL).strip()
+
+    # If no tool calls, return the response directly
+    if not response.message.tool_calls:
+        print('No tool calls detected')
+        return response.message
+
+    # Handle tool calls if present
+    tool_outputs = []
+    for tool in response.message.tool_calls:
+        if function_to_call := available_functions.get(tool.function.name):
+            # Drop arguments the model invented that the function doesn't accept
+            accepted = inspect.signature(function_to_call).parameters
+            arguments = {
+                key: value
+                for key, value in (tool.function.arguments or {}).items()
+                if key in accepted
+            }
+            output = function_to_call(**arguments)
+            if output:
+                tool_outputs.append({
+                    'role': 'tool',
+                    'content': output,
+                    'name': tool.function.name
+                })
+
+    if tool_outputs:
+        # Add the assistant's tool call message
+        messages.append({
+            'role': 'assistant',
+            'content': response.message.content or '',
+            'tool_calls': response.message.tool_calls
+        })
+        # Add the tool outputs
+        messages.extend(tool_outputs)
+
+        final_response = chat('qwen-pi', messages=messages, tools=tools)
+
+        # Clean the final response content
+        if 'content' in final_response.message and final_response.message['content']:
+            final_response.message['content'] = re.sub(
+                r'<think>.*?</think>', '', final_response.message['content'], flags=re.DOTALL).strip()
+        return final_response.message
+
+    return response.message
